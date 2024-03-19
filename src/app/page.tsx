@@ -1,37 +1,80 @@
-import Link from "next/link";
+import React from "react";
+import Header from "./components/Header";
+import Card from "./components/Card";
 
-export default function HomePage() {
+type Weather = {
+  latitude: number;
+  longitude: number;
+  generationtime_ms: number;
+  utc_offset_seconds: number;
+  timezone: string;
+  timezone_abbreviation: string;
+  elevation: number;
+  current_units: {
+    time: string;
+    interval: string;
+    temperature_2m: string;
+    wind_speed_10m: string;
+    relative_humidity_2m: string;
+  };
+  current: {
+    time: string;
+    interval: number;
+    temperature_2m: number;
+    wind_speed_10m: number;
+    relative_humidity_2m: number;
+  };
+}
+
+type CatFact = {
+  data: string;
+};
+
+export default async function HomePage() {
+  const getWeatherData = await getWeather();
+  const getCatFactsData = await getCatFacts();
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow flex items-center justify-center">
+        <div className="container mx-auto max-w-[600px]">
+          <div className="grid grid-cols-2 gap-8 p-4">
+            <div className="flex flex-col gap-4">
+              <h1 className="font-bold text-4xl mb-8">
+                It&apos;s Tuesday, {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at {new Date().toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true })}
+              </h1>
+              <Card label="Houston, TX">
+                <div>
+                  <p className="text-5xl my-3">{getWeatherData.current.temperature_2m}°C</p>
+                  <p>Wind speed {getWeatherData.current.wind_speed_10m} km/h</p>
+                  <p className="mt-1">Humidity {getWeatherData.current.relative_humidity_2m}%</p>
+                </div>
+              </Card>
             </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
+            <div className="flex flex-col gap-8">
+              <Card label="About Me">
+                <div>
+                  My name is Mikayla, I love programming, cooking/baking, reading, and playing video games with my husband!
+                </div>
+              </Card>
+              <Card label="Cat Fact">
+              <div>{getCatFactsData?.data || "Loading cat fact..."}</div>
+              </Card>
             </div>
-          </Link>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
+}
+
+async function getWeather(): Promise<Weather> {
+  const data = await fetch('https://api.open-meteo.com/v1/forecast?latitude=29.760427&longitude=-95.369804&current=temperature_2m,wind_speed_10m,relative_humidity_2m')
+  return data.json() as Promise<Weather>;
+}
+
+async function getCatFacts(): Promise<CatFact> {
+  const timestamp = new Date().getTime();
+  const data = await fetch(`https://meowfacts.herokuapp.com/?timestamp=${timestamp}`)
+  return data.json() as Promise<CatFact>;
 }
