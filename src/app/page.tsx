@@ -2,6 +2,8 @@ import React from "react";
 import Header from "./components/Header";
 import Card from "./components/Card";
 
+
+//these 'types' specify th structure of the data fetched from the APIs
 type Weather = {
   latitude: number;
   longitude: number;
@@ -31,6 +33,7 @@ type CatFact = {
 };
 
 export default async function HomePage() {
+  //these are the async functions that fetch data from the specified APIs
   const getWeatherData = await getWeather();
   const getCatFactsData = await getCatFacts();
   return (
