@@ -32,6 +32,11 @@ type CatFact = {
   data: string;
 };
 
+//this will convert temp to F
+const convertCelsiusToFahrenheit = (celsius: number): number => {
+  return (celsius * 9) / 5 + 32;
+};
+
 export default async function HomePage() {
   //these are the async functions that fetch data from the specified APIs
   const getWeatherData = await getWeather();
@@ -48,10 +53,13 @@ export default async function HomePage() {
               </h1>
               <Card label="Houston, TX">
                 <div>
-                  <p className="text-5xl my-3">{getWeatherData.current.temperature_2m}°C</p>
+                  {/* <p className="text-5xl my-3">{getWeatherData.current.temperature_2m}°F</p>
                   <p>Wind speed {getWeatherData.current.wind_speed_10m} km/h</p>
-                  <p className="mt-1">Humidity {getWeatherData.current.relative_humidity_2m}%</p>
-                </div>
+                  <p className="mt-1">Humidity {getWeatherData.current.relative_humidity_2m}%</p> */}
+                   <p className="text-5xl my-3">{getWeatherData.current && convertCelsiusToFahrenheit(getWeatherData.current.temperature_2m)}°F</p>
+                  <p>Wind speed {getWeatherData.current?.wind_speed_10m} km/h</p>
+                  <p className="mt-1">Humidity {getWeatherData.current?.relative_humidity_2m}%</p>
+                 </div>
               </Card>
             </div>
             <div className="flex flex-col gap-8">
@@ -61,7 +69,7 @@ export default async function HomePage() {
                 </div>
               </Card>
               <Card label="Cat Fact">
-              <div>{getCatFactsData?.data || "Loading cat fact..."}</div>
+              <div style={{ height: "105px", overflowY: "auto" }}>{getCatFactsData?.data || "Loading cat fact..."}</div>
               </Card>
             </div>
           </div>
